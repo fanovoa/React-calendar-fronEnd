@@ -1,14 +1,14 @@
 import { createSlice } from '@reduxjs/toolkit';
 
 export const authSlice = createSlice({
-    name: 'Auth',
+    name: 'auth',
     initialState: {
         status: 'checking', // 'authenticated', 'not-authenticated'
         user:{},
         errorMessage: undefined,
     },
     reducers: {
-        checking:( state) => {
+        onChecking:( state) => {
             state.status = 'checking';
             state.user= {};
             state.errorMessage = undefined;
@@ -16,11 +16,19 @@ export const authSlice = createSlice({
         onLogin: ( state, { payload } ) => {
             state.status = 'authenticated';
             state.user = payload;
-            user.errorMessage = undefined;
+            state.errorMessage = undefined;
+        },
+        onLogout: (state,{ payload }) => {
+            state.status = 'not-authenticated';
+            state.user = {};
+            state.errorMessage = payload;
+        },
+        clearErrorMessage: ( state ) => {
+            state.errorMessage = undefined
         }
     }
 });
 
 
 // Action creators are generated for each case reducer function
-export const { checking, onLogin } = authSlice.actions;
+export const { onChecking, onLogin,onLogout, clearErrorMessage  } = authSlice.actions;
