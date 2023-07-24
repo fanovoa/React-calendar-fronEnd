@@ -37,8 +37,6 @@ export const useCalendarStore = () => {
           Swal.fire('Error al guardar', error.response.data?.msg, 'error')
       }
 
-      
-      
     }
 
     const startDeleteEvent = async() =>{
