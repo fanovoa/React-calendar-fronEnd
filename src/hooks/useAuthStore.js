@@ -13,7 +13,7 @@ export const useAuthStore = () => {
         try {
             const { data } = await calendarApi.post('/auth', {email, password });
             localStorage.setItem('token',data.token);
-            localStorage.setItem('token-int-date', new Date().getTime() );
+            localStorage.setItem('token-init-date', new Date().getTime() );
             dispatch( onLogin({name:data.name, uid: data.uid }) );
 
         } catch (error) {
@@ -24,21 +24,19 @@ export const useAuthStore = () => {
         }
     }
 
-    const startRegister = async({ name, email, password }) => {
+    const startRegister = async({ email, password, name }) => {
 
         dispatch( onChecking() );
-
         try {
+            const { data } = await calendarApi.post('/auth/new',{ email, password, name });
+            localStorage.setItem('token', data.token );
+            localStorage.setItem('token-init-date', new Date().getTime() );
+            dispatch( onLogin({ name: data.name, uid: data.uid }) );
             
-            const { data } = await calendarApi.post('/auth/new', {name, email, password });
-            localStorage.setItem('token',data.token);
-            localStorage.setItem('token-int-date', new Date().getTime() );
-            dispatch( onLogin({name:data.name, uid: data.uid }) );
-
         } catch (error) {
-            dispatch( onLogout(error.response.data?.msg || '---'));
+            dispatch( onLogout( error.response.data?.msg || '--' ) );
             setTimeout(() => {
-                dispatch(clearErrorMessage() );
+                dispatch( clearErrorMessage() );
             }, 10);
         }
     }
@@ -49,9 +47,10 @@ export const useAuthStore = () => {
         if(!token) return dispatch( onLogout());
 
         try {
-            const { data } = calendarApi.get('auth/renew')
+       
+            const { data } = await calendarApi.get('auth/renew');
             localStorage.setItem('token',data.token);
-            localStorage.setItem('token-int-date', new Date().getTime() );
+            localStorage.setItem('token-init-date', new Date().getTime() );
             dispatch( onLogin({name:data.name, uid: data.uid }) );
 
         } catch (error) {
@@ -67,17 +66,18 @@ export const useAuthStore = () => {
         dispatch( onLogout() );
     }
 
+
     return {
         //* Propiedades
-        status,
-        user,
         errorMessage,
+        status, 
+        user, 
 
         //* Métodos
         checkAuthToken,
         startLogin,
-        startRegister,
         startLogout,
+        startRegister,
     }
 
 }
